@@ -16,7 +16,7 @@ ENV APACHE_LOCK_DIR=/var/lock/apache2
 ENV APACHE_LOG_DIR=/var/log/apache2
 ENV BITBUCKET_USER=user
 ENV BITBUCKET_PASS=password
-ENV BITBUCKET_PROJECT=projectname
+ENV BITBUCKET_PROJECT=projectname.git
 ENV REPO_URL=https://$BITBUCKET_USER@bitbucket.org/$BITBUCKET_USER/$BITBUCKET_PROJECT
 ENV APACHE_CONF_SNIPPET_ID=confid
 ENV SITE_CONF_SNIPPET_ID=siteid
@@ -36,7 +36,7 @@ USER worker
 
 # Update 
 RUN sudo apt-get update
-RUN sudo apt-get install -y curl gnupg build-essential libssl-dev libyaml-dev libreadline-dev openssl mercurial zlib1g-dev bison libxml2-dev libxslt1-dev libcurl4-openssl-dev apt-transport-https ca-certificates openssh-client
+RUN sudo apt-get install -y curl gnupg build-essential libssl-dev libyaml-dev libreadline-dev openssl git-core zlib1g-dev bison libxml2-dev libxslt1-dev libcurl4-openssl-dev apt-transport-https ca-certificates openssh-client
 
 # install RVM
 RUN gpg --keyserver hkp://keys.gnupg.net --recv-keys 409B6B1796C275462A1703113804BB82D39DC0E3
@@ -102,7 +102,7 @@ RUN sudo chown worker:worker -R /var/www/eightyproof
 
 WORKDIR /var/www
 
-RUN /bin/bash -l -c 'hg clone $REPO_URL'
+RUN /bin/bash -l -c 'git clone $REPO_URL'
 
 WORKDIR /var/www/eightyproof
 
