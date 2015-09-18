@@ -14,14 +14,20 @@ ENV APACHE_PID_FILE=/var/run/apache2/apache2.pid
 ENV APACHE_RUN_DIR=/var/run/apache2
 ENV APACHE_LOCK_DIR=/var/lock/apache2
 ENV APACHE_LOG_DIR=/var/log/apache2
-ENV BITBUCKET_USER=user
+ENV BITBUCKET_USER=buttfart
 ENV BITBUCKET_PASS=password
-ENV BITBUCKET_PROJECT=projectname.git
-ENV REPO_URL=https://$BITBUCKET_USER@bitbucket.org/$BITBUCKET_USER/$BITBUCKET_PROJECT
-ENV APACHE_CONF_SNIPPET_ID=confid
-ENV SITE_CONF_SNIPPET_ID=siteid
-ENV SITE_CONF_URL=https://api.bitbucket.org/2.0/snippets/$BITBUCKET_USER/$SITE_CONF_SNIPPET_ID
-ENV APACHE2_CONF_URL=https://api.bitbucket.org/2.0/snippets/$BITBUCKET_USER/$APACHE_CONF_SNIPPET_ID
+ENV BITBUCKET_PROJECT=dockerinit
+ENV REPO_URL=https://$BITBUCKET_USER@bitbucket.org/$BITBUCKET_USER/$BITBUCKET_PROJECT.git
+ENV APACHE_CONF_SNIPPET_ID=r9xA7
+ENV APACHE_CONF_SNIPPET_SHA=3e92e0acc062788a3f8520e10c9a7b5b347dafd8
+ENV APACHE_CONF_FILE_NAME=apache2.conf
+ENV SITE_CONF_SNIPPET_ID=bojAq
+ENV SITE_CONF_SNIPPET_SHA=c4799b1b9f18b6aef00cca5932710fe970eadcdb
+ENV SITE_CONF_FILE_NAME=railsapp.apacheconf
+ENV SITE_CONF_URL=https://api.bitbucket.org/2.0/snippets/$BITBUCKET_USER/$SITE_CONF_SNIPPET_ID/$SITE_CONF_SNIPPET_SHA/files/$SITE_CONF_FILE_NAME
+ENV APACHE2_CONF_URL=https://api.bitbucket.org/2.0/snippets/$BITBUCKET_USER/$APACHE_CONF_SNIPPET_ID/$APACHE_CONF_SNIPPET_SHA/files/$APACHE_CONF_FILE_NAME
+ENV APACHE_RAILS_ENV=development
+ENV SERVER_ADMIN_EMAIL=webmaster@localhost
 
 USER root
 
@@ -78,6 +84,8 @@ RUN sudo apt-get update
 # Install Passenger + Apache module
 RUN sudo apt-get install -y libapache2-mod-passenger
 
+# add site and apache configurations
+
 # enable apache module and restart
 RUN sudo a2enmod passenger
 RUN sudo apache2ctl restart
@@ -89,34 +97,9 @@ RUN sudo passenger-memory-stats
 # update
 RUN sudo apt-get update
 
-# generate an ssh key and add it to our account
-RUN mkdir /home/worker/.ssh
-WORKDIR /home/worker/.ssh
-RUN ssh-keygen -t rsa -f worker_rsa -N '' && cat ./mcuser_rsa.pub | while read key; do curl --user "$BITBUCKET_USER:$BITBUCKET_PASS" --data-urlencode "key=$key" -X POST https://bitbucket.org/api/1.0/users/$BITBUCKET_USER/ssh-keys
-
-# add files
-RUN mkdir /var/www/eightyproof
-
-RUN sudo chown worker:worker -R /var/www/
-RUN sudo chown worker:worker -R /var/www/eightyproof
-
-WORKDIR /var/www
-
-RUN /bin/bash -l -c 'git clone $REPO_URL'
-
-WORKDIR /var/www/eightyproof
-
-RUN /bin/bash -l -c 'bundle install --deployment --without development test'
-RUN /bin/bash -l -c 'npm install'
-RUN /bin/bash -l -c 'bundle exec rake assets:precompile db:migrate'
-
-USER root
-
-RUN curl -L $SITE_CONF_URL > /etc/apache2/sites-enabled/000-default.conf
-RUN curl -L $APACHE2_CONF_URL > /etc/apache2/apache2.conf
-
 USER worker
 
-CMD sudo apache2ctl restart && tail -f /dev/null
+COPY ./init.sh /
+ENTRYPOINT ["/init.sh"]
 
 EXPOSE 80
