@@ -9,7 +9,7 @@ sudo chown worker:worker -R /var/www/$BITBUCKET_PROJECT
 sudo chown worker:worker /etc/apache2/sites-enabled/000-default.conf
 sudo chown worker:worker /etc/apache2/apache2.conf
 
-sudo mv /railsapp.apacheconf > /etc/apache2/sites-enabled/000-default.conf
+sudo mv /railsapp.apacheconf /etc/apache2/sites-enabled/000-default.conf
 
 # add env vars to apache2.conf
 echo "Define SERVER_ADMIN_EMAIL $SERVER_ADMIN_EMAIL" | cat - /etc/apache2/apache2.conf > /home/worker/apache2.conf.tmp && sudo mv /home/worker/apache2.conf.tmp /etc/apache2/apache2.conf
