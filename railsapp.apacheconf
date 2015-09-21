@@ -1,0 +1,13 @@
+<VirtualHost *:80>
+    ServerName 0.0.0.0
+    ServerAlias localhost
+    ServerAdmin ${SERVER_ADMIN_EMAIL}
+    DocumentRoot /var/www/${BITBUCKET_PROJECT}/public
+    RailsEnv ${APACHE_RAILS_ENV}
+    ErrorLog ${APACHE_LOG_DIR}/error.log
+    CustomLog ${APACHE_LOG_DIR}/access.log combined
+    <Directory "/var/www/${BITBUCKET_PROJECT}/public">
+        Options FollowSymLinks
+        Require all granted
+    </Directory>
+</VirtualHost>

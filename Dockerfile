@@ -17,15 +17,6 @@ ENV APACHE_LOG_DIR=/var/log/apache2
 ENV BITBUCKET_USER=buttfart
 ENV BITBUCKET_PASS=password
 ENV BITBUCKET_PROJECT=dockerinit
-ENV REPO_URL=https://$BITBUCKET_USER@bitbucket.org/$BITBUCKET_USER/$BITBUCKET_PROJECT.git
-ENV APACHE_CONF_SNIPPET_ID=r9xA7
-ENV APACHE_CONF_SNIPPET_SHA=3e92e0acc062788a3f8520e10c9a7b5b347dafd8
-ENV APACHE_CONF_FILE_NAME=apache2.conf
-ENV SITE_CONF_SNIPPET_ID=bojAq
-ENV SITE_CONF_SNIPPET_SHA=c4799b1b9f18b6aef00cca5932710fe970eadcdb
-ENV SITE_CONF_FILE_NAME=railsapp.apacheconf
-ENV SITE_CONF_URL=https://api.bitbucket.org/2.0/snippets/$BITBUCKET_USER/$SITE_CONF_SNIPPET_ID/$SITE_CONF_SNIPPET_SHA/files/$SITE_CONF_FILE_NAME
-ENV APACHE2_CONF_URL=https://api.bitbucket.org/2.0/snippets/$BITBUCKET_USER/$APACHE_CONF_SNIPPET_ID/$APACHE_CONF_SNIPPET_SHA/files/$APACHE_CONF_FILE_NAME
 ENV APACHE_RAILS_ENV=development
 ENV SERVER_ADMIN_EMAIL=webmaster@localhost
 
@@ -97,9 +88,12 @@ RUN sudo passenger-memory-stats
 # update
 RUN sudo apt-get update
 
-USER worker
-
+# now we add the script and make it executable
 COPY ./init.sh /
+COPY ./railsapp.apacheconf /
+RUN sudo chown worker:worker /init.sh
+RUN sudo chown worker:worker /railsapp.apacheconf
+RUN sudo chmod +x /init.sh
 ENTRYPOINT ["/init.sh"]
 
 EXPOSE 80
