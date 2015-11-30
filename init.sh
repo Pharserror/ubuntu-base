@@ -37,6 +37,8 @@ cd /var/www/$BITBUCKET_PROJECT
 
 /bin/bash -l -c 'bundle install --deployment --without development test'
 /bin/bash -l -c 'npm install'
+/bin/bash -l -c 'npm install webpack -g'
+/bin/bash -l -c 'webpack'
 /bin/bash -l -c 'bundle exec rake assets:precompile db:migrate'
 
 sudo apache2ctl restart && tail -f /dev/null

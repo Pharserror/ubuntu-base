@@ -17,8 +17,10 @@ ENV APACHE_LOG_DIR=/var/log/apache2
 ENV BITBUCKET_USER=buttfart
 ENV BITBUCKET_PASS=password
 ENV BITBUCKET_PROJECT=dockerinit
-ENV APACHE_RAILS_ENV=development
+ENV APACHE_RAILS_ENV=production
 ENV SERVER_ADMIN_EMAIL=webmaster@localhost
+ENV SECRET_KEY_BASE=mysupersecretkey
+ENV SECRET_TOKEN=mysupersecrettoken
 
 USER root
 
